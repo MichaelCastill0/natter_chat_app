@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Natter Chat</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <style>
+      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+      #input:focus { outline: none; }
+      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages > li { padding: 0.5rem 1rem; }
+      #messages > li:nth-child(odd) { background: #efefef; }
+
+    #room-controls { display: flex; justify-content: space-around; padding: 1rem; background: #f4f4f4; position: fixed; top: 0; left: 0; right: 0; }
+    #room-controls input { margin-right: 1rem; }
+    </style>
+  </head>
+  <body>
+    <div id="room-controls">
+      <input id="roomName" type="text" placeholder="Enter room name">
+      <button onclick="createRoom()">Create Room</button>
+      <button onclick="joinRoom()">Join Room</button>
+      <button onclick="leaveRoom()">Leave Room</button>
+      <button onclick="deleteRoom()">Delete Room</button>
+    </div>
+
+    <ul id="messages"></ul>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" /><button>Send</button>
+    </form>
+    <script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  const form = document.getElementById('form');
+  const input = document.getElementById('input');
+  const messages = document.getElementById('messages');
+
+  function createRoom() {
+      const room = document.getElementById('roomName').value;
+      socket.emit('createRoom', room);
+    }
+
+  function joinRoom() {
+      const room = document.getElementById('roomName').value;
+      socket.emit('joinRoom', room);
+    }
+
+    function leaveRoom() {
+      const room = document.getElementById('roomName').value;
+      socket.emit('leaveRoom', room);
+    }
+
+    function deleteRoom() {
+      const room = document.getElementById('roomName').value;
+      socket.emit('deleteRoom', room);
+    }
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const room = document.getElementById('roomName').value;
+    if (input.value && room) {
+      socket.emit('sendMessage',{room, message: input.value} );
+      input.value = '';
+    }else {
+      alert('Please enter a room name and a message.')
+    }
+  });
+
+  socket.on('chatHistory', (messages) => {
+    console.log('in chat history');
+    console.log('Chat history:', messages);
+    messages.forEach(msg => {
+      const item = document.createElement('li');
+      item.textContent = msg.message;
+      document.getElementById('messages').appendChild(item);
+    });
+    window.scrollTo(0,document.body.scrollHeight);
+  });
+
+  socket.on('chat message', (msg) => {
+    const item = document.createElement('li');
+    item.textContent = msg;
+    messages.appendChild(item);
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+
+  socket.on('message', (msg) => {
+    const item = document.createElement('li');
+    item.textContent - msg;
+    messages.appendChild(item);
+    window.scrollTo(0,document.body.scrollHeight);
+  });
+/*
+  socket.on('chat message', (msg) => {
+    const item = document.createElement('li');
+    item.textContent = msg;
+    messages.appendChild(item);
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+*/
+  socket.on('error', (err) => {
+      console.error('Error received:', err);
+      alert('An error occurred: ' + err);
+    });
+
+  socket.on('roomCreated', (room) => {
+      alert(`Room ${room} created!`);
+    });
+
+  socket.on('roomDeleted', (room) => {
+    alert('Room ${room} has been deleted!');
+    document.getElementById.innerHTML= '';
+  })
+
+</script>
+  </body>
+</html>
