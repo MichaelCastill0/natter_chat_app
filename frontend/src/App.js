@@ -1,4 +1,5 @@
-import React, { useState, useEffect} from 'react';
+import { useState, useEffect} from 'react';
+import { jwtDecode } from 'jwt-decode';
 import io from 'socket.io-client';
 import './App.css';
 
@@ -11,9 +12,24 @@ function App() {
 
  function handleCallbackResponse(response) {
   console.log("Encode JWT ID token:" + response.credential);
+  var userObject = jwtDecode(response.credential);
+  console.log(userObject);
  }
+  useEffect( ()=>{
+    /* global google */
+    google.accounts.id.initialize({
+      client_id:
+      "457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com",
+      callback: handleCallbackResponse,
+    });
+    
+    google.accounts.id.renderButton(document.getElementById("signInDiv"), {
+      theme: "outline",
+      size: "large",
+    });
+  }, []);
 
- useEffect(()=> {
+  useEffect(()=> {
     socket.on('chatHistory', (Messages) => {
       setMessages(Messages);
     });
@@ -31,7 +47,7 @@ function App() {
     });
 
     socket.on('roomLeft', (room) => {
-      alert('Left room $(room)');
+      alert('Left room ${room}');
     });
 
     socket.on('roomDeleted', (room) => {
@@ -41,18 +57,6 @@ function App() {
 
     socket.on('error', (err) => {
       alert('An error occurred: ' + err);
-    });
-    
-    /* global google */
-    google.accounts.id.initialize({
-      client_id:
-      "457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com",
-      callback: handleCallbackResponse,
-    });
-    
-    google.accounts.id.renderButton(document.getElementById("signInDiv"), {
-      theme: "outline",
-      size: "large",
     });
 
     return () => {
@@ -64,6 +68,7 @@ function App() {
       socket.off('roomDeleted');
       socket.off('error');
     };
+
   }, []);
 
   const createRoom = () => {
