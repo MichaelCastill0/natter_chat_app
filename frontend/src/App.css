@@ -1,7 +1,24 @@
 .App {
-    text-align: center;
-  }
-  
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 20%;
+  background: #f4f4f4;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.chat-container {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
   .App-logo {
     height: 40vmin;
     pointer-events: none;
@@ -42,73 +59,72 @@
       transform: rotate(360deg);
     }
   }
+ 
+  #room-controls {
+    margin-bottom: 20px;
+  }
   
-body { 
-    margin: 0;
-    padding-bottom: 3rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-
-#form {
-    background: rgba(0, 0, 0, 0.15);
-    padding: 0.25rem;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    height: 3rem;
+  #room-controls input {
+    width: calc(100% - 90px);
+    padding: 10px;
+    margin-right: 10px;
     box-sizing: border-box;
-    backdrop-filter: blur(10px);
-}
-
-#input {
-    border: none;
-    padding: 0 1rem;
-    flex-grow: 1;
-    border-radius: 2rem;
-    margin: 0.25rem;
-}
-#input:focus {
-    outline: none;
-}
-
-#form > button {
-    background: #333;
-    border: none;
-    padding: 0 1rem;
-    margin: 0.25rem;
-    border-radius: 3px;
-    outline: none;
-    color: #fff;
-}
-
-#messages {
+  }
+  
+  #room-controls button {
+    padding: 10px;
+    margin-bottom: 5px;
+    width: 100%;
+  }
+  
+  #room-list {
+    margin-top: 20px;
+  }
+  
+  #room-list h2 {
+    margin-bottom: 10px;
+  }
+  
+  #room-list ul {
     list-style-type: none;
-    margin: 0;
     padding: 0;
-}
-
-#messages > li {
-    padding: 0.5rem 1rem;
-}
-
-#messages > li:nth-child(odd) {
+  }
+  
+  #room-list li {
+    padding: 10px;
+    background: #fff;
+    margin-bottom: 5px;
+    border-radius: 4px;
+  }
+  
+  #messages {
+    list-style-type: none;
+    padding: 0;
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+  
+  #messages li {
+    padding: 10px;
     background: #efefef;
-}
-
-#room-controls {
+    margin-bottom: 5px;
+    border-radius: 4px;
+  }
+  
+  #form {
     display: flex;
-    justify-content: space-around;
-    padding: 1rem;
-    background: #f4f4f4;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-}
-
-#room-controls input {
-    margin-right: 1rem;
-}
-
+  }
+  
+  #input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+  }
+  
+  #form button {
+    padding: 10px;
+  }
+  

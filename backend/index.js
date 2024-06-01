@@ -4,7 +4,6 @@ const { join } = require('node:path');
 const { Server } = require('socket.io');
 
 const app = express();
-const port = 3000;
 const server = createServer(app);
 const io = new Server(server);
 
@@ -23,6 +22,7 @@ mongoose
   .then(() => console.log("MongoDB connection established"))
   .catch((err) => console.error("MongoDB connection error:",err));
 
+app.use(express.static(join(__dirname, 'client/build')));
 
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'));
@@ -53,7 +53,7 @@ io.on('connection', (socket) => {
     socket.join(room);
     console.log(`User joined room: ${room}`);
     //socket.emit('roomJoined',room)
-    socket.to(room).emit('message', 'A new user has joined the room');
+    io.to(socket.id).emit('roomJoined', room);
 
     try {
       console.log('finding chat history');
@@ -71,7 +71,8 @@ io.on('connection', (socket) => {
     socket.leave(room);
     console.log(`User left room: ${room}`);
     //socket.emit('roomLeft',room);
-    socket.to(room).emit('message', 'A user has left the room');
+    //socket.to(room).emit('message', 'A user has left the room');
+    io.to(socket.id).emit('roomLeft', room);
   });
 
   socket.on('sendMessage', async (data) => {
@@ -102,6 +103,6 @@ io.on('connection', (socket) => {
     });
   });
 */
-server.listen(port, () => {
-  console.log('server running at http://localhost:3000');
+server.listen(5000, () => {
+  console.log('server running at http://localhost:5000');
 });
