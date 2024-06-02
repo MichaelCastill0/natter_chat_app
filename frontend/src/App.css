@@ -3,6 +3,13 @@
   height: 100vh;
 }
 
+#signInDiv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
 .sidebar {
   width: 20%;
   background: #f4f4f4;
@@ -39,12 +46,6 @@
     justify-content: center;
     font-size: calc(10px + 2vmin);
     color: white;
-  }
-  #signInDiv {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
   }
   
   .App-link {

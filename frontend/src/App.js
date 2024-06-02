@@ -1,17 +1,50 @@
 import React, { useState, useEffect} from 'react';
+import { jwtDecode } from 'jwt-decode';
 import io from 'socket.io-client';
 import './App.css';
 
-const socket = io();
+const socket = io.connect('http://localhost:5000')
 
 function App() {
- const [room, setRoom] = useState('');
- const [message, setMessage] = useState('');
- const[messages, setMessages] = useState([]);
- const [rooms,setRooms] = useState([]);
+  const [user, setUser] = useState({});
+  const [showSignIn, setShowSignIn] = useState(true); // State to control the visibility of the sign-in button
 
- useEffect(()=> {
-  socket.on('chatHistory', (Messages) => {
+  const [room, setRoom] = useState('');
+  const [message, setMessage] = useState('');
+  const[messages, setMessages] = useState([]);
+  const [rooms,setRooms] = useState([]);
+
+/* *********************Google Sign-In********************************************** */
+  function handleCallbackResponse(response) {
+    console.log("Encode JWT ID token:" + response.credential);
+    var userObject = jwtDecode(response.credential);
+    console.log(userObject);
+    setShowSignIn(false); // Hide the sign-in button
+  }
+
+  function handleSignOut(event) {
+    setUser({});
+    setShowSignIn(true); // Show the sign-in button again
+  }
+
+  useEffect(() => {
+    /* global google */
+    google.accounts.id.initialize({
+      client_id: "your client id/ secret",
+      callback: handleCallbackResponse,
+    });
+    if (showSignIn) {
+      google.accounts.id.renderButton(document.getElementById("signInDiv"), {
+        theme: "outline",
+        size: "large",
+      });
+      google.accounts.id.prompt();
+    }
+  }, [showSignIn]); // Re-run this effect only when showSignIn changes
+
+/* ***************************Socket IO************************************** */
+  useEffect(()=> {
+    socket.on('chatHistory', (Messages) => {
     setMessages(Messages);
   });
 
@@ -84,6 +117,18 @@ const sendMessage = (e) => {
  
 return (
   <div className="App">
+    {showSignIn && <div id="signInDiv"></div>}{" "}
+    {/* Conditionally render the sign-in button */}
+    {Object.keys(user).length !== 0 && (
+      <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
+    )}
+    {Object.keys(user).length !== 0 && (
+      <div>
+        <img src={user.picture} alt="User profile" />
+        <h3>{user.name}</h3>
+      </div>
+    )}
+
     <div className="sidebar">
     <div id = "room-controls">
       <input
