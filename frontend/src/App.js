@@ -13,6 +13,7 @@ function App() {
   const [message, setMessage] = useState('');
   const[messages, setMessages] = useState([]);
   const [rooms,setRooms] = useState([]);
+  const [emailToAdd, setEmailToAdd] = useState('')
 
 /* *********************Google Sign-In********************************************** */
   function handleCallbackResponse(response) {
@@ -21,6 +22,10 @@ function App() {
     console.log(userObject);
     setUser(userObject);
     setShowSignIn(false); // Hide the sign-in button
+
+    socket.emit('saveUser', { token: response.credential });//Call saveUser and send token
+
+    socket.emit('getUserRooms', userObject.email);
   }
 
   function handleSignOut(event) {
@@ -75,6 +80,16 @@ function App() {
     setRooms(prevRooms => prevRooms.filter(r => r !== room));
   });
 
+  socket.on('userAddedToRoom', ({ email, room }) => {
+    if (email === user.email) {
+      setRooms((prevRooms) => [...prevRooms, room]);
+    }
+  });
+
+  socket.on('userRooms', (userRooms) => {
+    setRooms(userRooms);
+  });
+
   socket.on('error', (err) => {
     alert('An error occurred: ' + err);
   });
@@ -86,9 +101,11 @@ function App() {
     socket.off('roomJoined');
     socket.off('roomLeft');
     socket.off('roomDeleted');
+    socket.off('userAddedToRoom');
+    socket.off('userRooms');
     socket.off('error');
   };
-}, [rooms]);
+}, [rooms, user.email]);
 
 const createRoom = () => {
   socket.emit('createRoom', room);
@@ -104,6 +121,10 @@ const leaveRoom = () => {
 
 const deleteRoom = () => {
   socket.emit('deleteRoom', room);
+};
+
+const addUserToRoom = () => {
+  socket.emit('addUserToRoom', { email: emailToAdd, room });
 };
 
 const sendMessage = (e) => {
@@ -143,6 +164,16 @@ return (
       <button onClick={joinRoom}>Join Room</button>
       <button onClick={leaveRoom}>Leave Room</button>
       <button onClick={deleteRoom}>Delete Room</button>
+
+      <input
+            id="emailToAdd"
+            type="text"
+            placeholder="Enter email to add to room"
+            value={emailToAdd}
+            onChange={(e) => setEmailToAdd(e.target.value)}
+          />
+          <button onClick={addUserToRoom}>Add User to Room</button>
+
     </div>
 
     <div id="room-list">

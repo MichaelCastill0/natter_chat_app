@@ -5,7 +5,7 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const {OAuth2Client} = require('google-auth-library');
 const client = new OAuth2Client('457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com');
-
+const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(cors());
@@ -24,6 +24,8 @@ const mongoose = require("mongoose");
 const mongoURI = process.env.DATABSE;
 require("./model/message");
 const Message = mongoose.model("Message");
+
+require("./model/users");
 const User = mongoose.model("User");
 
 mongoose
@@ -69,28 +71,52 @@ io.on('connection', (socket) => {
   });
 */
   // Modified function with socket
-  socket.on('saveUser', async (req, res) => {
-    const { token } = req.body;
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: '457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com',
-    });
-    const { name, email } = ticket.getPayload;
-    const userToSave = new User({ name, email });
-    userToSave.save();
+  socket.on('saveUser', async ({token}) => {
+    const decodeToken = jwt.decode(token);  //decode token
+    const { name, email } = decodeToken; //get email and name
+    const userToSave = new User({ name, email }); //save name to schema
+    await userToSave.save(); //save schema to database
+
+
+//    const ticket = await client.verifyIdToken({
+//      idToken: token,
+//      audience: '457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com',
+//    });
+    
+    //console.log(`User EMAIL: ${email} and USER NAME: ${name}`);
+    
+    
   });
   
-  socket.on('createRoom', (room) => {
-    socket.join(room);
-    console.log(`Room created: ${room}`);
-    socket.emit('roomCreated', room);
+  socket.on('createRoom', async (room) => {
+
+    const email = socket.handshake.query.email; // Assuming email is sent in query params during connection
+    const user = await User.findOne({ email });
+    if (user) {
+      if (!user.rooms.includes(room)) {
+        user.rooms.push(room);
+        await user.save();
+      }
+      socket.join(room);
+      socket.emit('roomCreated', room);
+      io.to(socket.id).emit('userRooms', user.rooms);
+    }
   });
 
   socket.on('joinRoom', async (room) => {
-    socket.join(room);
-    console.log(`User joined room: ${room}`);
-    //socket.emit('roomJoined',room)
-    io.to(socket.id).emit('roomJoined', room);
+    const email = socket.handshake.query.email;
+    const user = await User.findOne({ email });
+    if (user) {
+      if (!user.rooms.includes(room)) {
+        user.rooms.push(room);
+        await user.save();
+      }
+      socket.join(room);
+      socket.emit('roomJoined', room);
+      io.to(socket.id).emit('userRooms', user.rooms);
+    }
+  //  io.to(socket.id).emit('roomJoined', room);
+  
 
     try {
       console.log('finding chat history');
@@ -110,6 +136,7 @@ io.on('connection', (socket) => {
     //socket.emit('roomLeft',room);
     //socket.to(room).emit('message', 'A user has left the room');
     io.to(socket.id).emit('roomLeft', room);
+    io.to(socket.id).emit('userRooms', user.rooms);
   });
 
   socket.on('sendMessage', async (data) => {
@@ -118,6 +145,32 @@ io.on('connection', (socket) => {
       const messageToSave = new Message({room,message});
       messageToSave.save();
     });
+
+    socket.on('addUserToRoom', async ({ email, room }) => {
+ 
+        const user = await User.findOne({ email });
+        if (user) {
+          if (!user.rooms.includes(room)) {
+            user.rooms.push(room);
+            await user.save();
+          }
+          socket.to(room).emit('userAddedToRoom', { email, room });
+        } else {
+          socket.emit('error', 'User not found');
+        }
+    });
+
+    socket.on('getUserRooms', async (email) => {
+        const user = await User.findOne({ email });
+        if (user) {
+          socket.emit('userRooms', user.rooms);
+        } else {
+          socket.emit('error', 'User not found');
+        }
+      
+    });
+
+
 
     socket.on('deleteRoom', async (room) => {
       //delete chatHistory[messages];
