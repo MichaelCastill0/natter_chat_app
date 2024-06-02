@@ -3,6 +3,9 @@ const { createServer } = require('node:http');
 const { join } = require('node:path');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const {OAuth2Client} = require('google-auth-library');
+const client = new OAuth2Client('457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com');
+
 
 const app = express();
 app.use(cors());
@@ -21,6 +24,7 @@ const mongoose = require("mongoose");
 const mongoURI = process.env.DATABSE;
 require("./model/message");
 const Message = mongoose.model("Message");
+const User = mongoose.model("User");
 
 mongoose
   .connect(mongoURI, {
@@ -36,6 +40,10 @@ app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'));
 });
 
+app.use(express.json());
+
+
+
 //io.on('connection', (socket) => {
 //  console.log('a user connected');
 //});
@@ -49,7 +57,28 @@ io.on('connection', (socket) => {
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
 
+  /* Original Function
+  app.post('/google-login', async (req, res) => {
+  const { token } = req.body;
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+      audience: '457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com',
+  });
+  const { name, email, picture } = ticket.getPayload();
 
+  });
+*/
+  // Modified function with socket
+  socket.on('saveUser', async (req, res) => {
+    const { token } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: '457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com',
+    });
+    const { name, email } = ticket.getPayload;
+    const userToSave = new User({ name, email });
+    userToSave.save();
+  });
   
   socket.on('createRoom', (room) => {
     socket.join(room);
