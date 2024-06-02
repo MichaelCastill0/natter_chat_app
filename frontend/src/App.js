@@ -16,9 +16,10 @@ function App() {
 
 /* *********************Google Sign-In********************************************** */
   function handleCallbackResponse(response) {
-    console.log("Encode JWT ID token:" + response.credential);
+    console.log(`Encode JWT ID token: ${response.credential}`);
     var userObject = jwtDecode(response.credential);
     console.log(userObject);
+    setUser(userObject);
     setShowSignIn(false); // Hide the sign-in button
   }
 
@@ -30,7 +31,7 @@ function App() {
   useEffect(() => {
     /* global google */
     google.accounts.id.initialize({
-      client_id: "your client id/ secret",
+      client_id: "457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com",
       callback: handleCallbackResponse,
     });
     if (showSignIn) {
