@@ -108,15 +108,15 @@ function App() {
 }, [rooms, user.email]);
 
 const createRoom = () => {
-  socket.emit('createRoom', room);
+  socket.emit('createRoom', {room, email: user.email});
 };
 
 const joinRoom = () => {
-  socket.emit('joinRoom', room);
+  socket.emit('joinRoom', {room, email: user.email});
 };
 
 const leaveRoom = () => {
-  socket.emit('leaveRoom', room);
+  socket.emit('leaveRoom', {room, email: user.email});
 };
 
 const deleteRoom = () => {

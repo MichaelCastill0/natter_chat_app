@@ -88,9 +88,9 @@ io.on('connection', (socket) => {
     
   });
   
-  socket.on('createRoom', async (room) => {
-
-    const email = socket.handshake.query.email; // Assuming email is sent in query params during connection
+  socket.on('createRoom', async (data) => {
+    const {room, email} = data;
+    //const email = socket.handshake.query.email; // Assuming email is sent in query params during connection
     const user = await User.findOne({ email });
     if (user) {
       if (!user.rooms.includes(room)) {
@@ -103,8 +103,9 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('joinRoom', async (room) => {
-    const email = socket.handshake.query.email;
+  socket.on('joinRoom', async (data) => {
+    const {room, email} = data;
+  //  const email = socket.handshake.query.email;
     const user = await User.findOne({ email });
     if (user) {
       if (!user.rooms.includes(room)) {
@@ -130,13 +131,16 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('leaveRoom', (room) => {
+  socket.on('leaveRoom', async (data) => {
+    const {room, email} = data;
     socket.leave(room);
+    const user = await User.findOne({ email });
     console.log(`User left room: ${room}`);
-    //socket.emit('roomLeft',room);
-    //socket.to(room).emit('message', 'A user has left the room');
-    io.to(socket.id).emit('roomLeft', room);
-    io.to(socket.id).emit('userRooms', user.rooms);
+    if (user) {
+      user.rooms = user.rooms.filter(r => r !== room);
+      await user.save();
+      io.to(socket.id).emit('userRooms', user.rooms);
+    }
   });
 
   socket.on('sendMessage', async (data) => {
