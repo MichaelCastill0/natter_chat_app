@@ -1,8 +1,9 @@
 import React, { useState, useEffect} from 'react';
-import Header from '../components/Header'
+import { useNavigate, Router, Routes, Route } from 'react-router-dom';
 import Login from '../Pages/Login'
 import { jwtDecode } from 'jwt-decode';
 import io from 'socket.io-client';
+//import { useSignOut } from 'react-auth-kit/hooks/useSignOut';
 import '../App.css';
 
 const socket = io.connect('http://localhost:5000')
@@ -15,6 +16,14 @@ function Home() {
     const [emailToAdd, setEmailToAdd] = useState('')
 
     const [user, setUser] = useState({});
+
+    //const signOut = useSignOut();
+    const navigate = useNavigate();
+
+    const logout = () => {
+      //signOut();
+      navigate('/login');
+    };
   
     /* ***************************Socket IO************************************** */
   useEffect(()=> {
@@ -107,7 +116,6 @@ const sendMessage = (e) => {
 
     return (
         <div>
-            <Header />
             <h2>Home Page</h2>
             <div className="sidebar">
             <div id = "room-controls">
@@ -142,6 +150,13 @@ const sendMessage = (e) => {
                 ))}
             </ul>
             </div>
+              <Routes>
+                <Route path = '/login' exact>
+                  <button onClick={()=> {setIsAuth(false), logout}}>
+                    Log Out
+                  </button>
+                </Route>
+              </Routes>
             </div>
 
             <div className = "chat-container">
@@ -160,8 +175,8 @@ const sendMessage = (e) => {
                 />
                 <button type="submit">send</button>
                 </form>
-                </div>
+              </div>
         </div>
     )
 }
-export default Home
+export default Home;

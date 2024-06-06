@@ -15,8 +15,8 @@ const socket = io.connect('http://localhost:5000')
 export const UserContext = createContext();
 
 function App() {
-  //const [user, setUser] = useState({ loggedIn: false})
- ///*
+  const [user, setUser] = useState({ loggedIn: false})
+ /*
   const loggedIn = false;
   const [room, setRoom] = useState('');
   const [message, setMessage] = useState('');
@@ -26,9 +26,9 @@ function App() {
 
   const [showSignIn, setShowSignIn] = useState(true); // State to control the visibility of the sign-in button
   const [user, setUser] = useState({});
-//*/
+*/
 /* *********************Google Sign-In********************************************** */
-///*
+/*
   function handleCallbackResponse(response) {
     console.log(`Encode JWT ID token: ${response.credential}`);
     var userObject = jwtDecode(response.credential);
@@ -55,7 +55,9 @@ function App() {
   }
 
   useEffect(() => {
+*/
     /* global google */
+/*
     google.accounts.id.initialize({
       client_id: "457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com",
       callback: handleCallbackResponse,
@@ -68,9 +70,9 @@ function App() {
       google.accounts.id.prompt();
     }
   }, [showSignIn]); // Re-run this effect only when showSignIn changes
-//*/
+*/
     /* ***************************Socket IO************************************** */
-///*
+/*
     useEffect(()=> {
       socket.on('chatHistory', (Messages) => {
       setMessages(Messages);
@@ -159,97 +161,21 @@ function App() {
     }
   };
 
-//*/
+*/
 /* **************************Return********************************** */
-/*
+
   return (
     <div className="App">
-      */
-      if(!loggedIn)
-      {
-        return (
-          <div className="App">
-              {showSignIn && <div id="signInDiv">
-                { /*Conditionally render the sign-in button*/ }
-                {Object.keys(user).length !== 0 && (
-                  <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
-                )}
-                {Object.keys(user).length !== 0 && (
-                  <div>
-                    <img src={user.picture} alt="User profile" />
-                    <h3>{user.name}</h3>
-                  </div>
-                )}
-              </div>}{" "}
-            </div>
-        );
-      }
-
-      if(loggedIn)
-      {
-        <div className="App">
-        <div>
-          <Header />
-          <h2>Home Page</h2>
-          <div className="sidebar">
-          <div id = "room-controls">
-          <input
-              id="roomName"
-              type="text"
-              placeholder="Enter room name"
-              value={room}
-              onChange={(e) => setRoom(e.target.value)}
-          />
-          <button onClick={createRoom}>Create Room</button>
-          <button onClick={joinRoom}>Join Room</button>
-          <button onClick={leaveRoom}>Leave Room</button>
-          <button onClick={deleteRoom}>Delete Room</button>
-
-          <input
-                  id="emailToAdd"
-                  type="text"
-                  placeholder="Enter email to add to room"
-                  value={emailToAdd}
-                  onChange={(e) => setEmailToAdd(e.target.value)}
-              />
-              <button onClick={addUserToRoom}>Add User to Room</button>
-
-          </div>
-
-          <div id="room-list">
-          <h2>Rooms</h2>
-          <ul>
-              {rooms.map((room,index) => (
-              <li key={index}>{room}</li>
-              ))}
-          </ul>
-          </div>
-          </div>
-
-          <div className = "chat-container">
-          <ul id="messages">
-          {messages.map((msg,index)=>(
-              <li key={index}><strong>{msg.userName}: </strong>{msg.message}</li>
-          ))}
-          </ul>
-
-          <form id="form" onSubmit={sendMessage}>
-          <input
-              id="input"
-              autocomplete="off"
-              vallue={message}
-              onChange={(e) => setMessage(e.target.value)}
-              />
-              <button type="submit">send</button>
-              </form>
-              </div>
-        </div>
-        </div>
-      }
-      /*
-      </div>
+      <UserContext.Provider value={{user, setUser}}>
+        <BrowserRouter>
+          <Routes>
+            <PrivateRoutes path='/' component={Home} isAuth={user} />
+            <Route element={<Login />} path="/login" />
+          </Routes>
+        </BrowserRouter>
+      </UserContext.Provider>
+    </div>
   );
-  */
 }
 
 /*

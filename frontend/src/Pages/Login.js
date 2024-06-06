@@ -1,4 +1,3 @@
-import Header from '../components/Header'
 import logo from '../assets/logo.png'
 import React, { useState, useEffect} from 'react';
 import io from 'socket.io-client';
@@ -48,10 +47,9 @@ function Login() {
         }
       }, [showSignIn]); // Re-run this effect only when showSignIn changes
     
-    if(!loggedIn){
+    if(!loggedIn/*Need to use Context*/){
       return (
           <div>
-              <Header />
               <h2>Login Page</h2>
               <img src={logo} alt="" />
 
@@ -71,8 +69,9 @@ function Login() {
           </div>
       );
   }
-  if(loggedIn){
+  if(loggedIn/*Need to use Context*/){
     return(
+        //Code to redirect to '/' a.k.a Home.js
         <BrowserRouter>
           <Routes>
             <Route element={<App />} path="/" />
