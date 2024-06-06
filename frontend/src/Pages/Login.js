@@ -1,9 +1,16 @@
 import Header from '../components/Header'
-import logo from '../public/logo.png'
+import logo from '../assets/logo.png'
+import React, { useState, useEffect} from 'react';
+import io from 'socket.io-client';
+import { jwtDecode } from 'jwt-decode';
 
+const socket = io.connect('http://localhost:5000')
 
-export default function Login() {
+function Login() {
     
+    const [showSignIn, setShowSignIn] = useState(true); // State to control the visibility of the sign-in button
+    const [user, setUser] = useState({});
+
     function handleCallbackResponse(response) {
         console.log(`Encode JWT ID token: ${response.credential}`);
         var userObject = jwtDecode(response.credential);
@@ -18,7 +25,8 @@ export default function Login() {
     
       function handleSignOut(event) {
         setUser({});
-        setShowSignIn(true); // Show the sign-in button again
+        setShowSignIn(true);
+         // Show the sign-in button again
       }
     
       useEffect(() => {
@@ -42,6 +50,20 @@ export default function Login() {
             <h2>Login Page</h2>
             <img src={logo} alt="" />
 
+            {showSignIn && <div id="signInDiv">
+            {/* Conditionally render the sign-in button */}
+            {Object.keys(user).length !== 0 && (
+                <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
+            )}
+            {Object.keys(user).length !== 0 && (
+                <div>
+                <img src={user.picture} alt="User profile" />
+                <h3>{user.name}</h3>
+                </div>
+            )}
+            </div>}{" "}
         </div>
     )
 }
+
+export default Login
