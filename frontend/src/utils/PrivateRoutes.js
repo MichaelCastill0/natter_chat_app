@@ -7,9 +7,9 @@ const useAuth = () => {
     const { user } = useContext(UserContext);
     return user && user.loggedIn;
 }
-const PrivateRoutes = () => {
+const PrivateRoutes = (isAuth) => {
     //let auth = {'token':true}
-    const isAuth = useAuth;
+   // const isAuth = useAuth;
 
     return isAuth ? <Outlet /> : <Navigate to = '/'/>;
 /*    
