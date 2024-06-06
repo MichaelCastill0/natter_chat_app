@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema(
     {
+        userName: {
+            type: String,
+            required: true,
+        },
         room: {
             type: String,
             required: true,

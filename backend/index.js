@@ -144,9 +144,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('sendMessage', async (data) => {
-    const {room, message} = data;
-      io.to(room).emit('chat message', message);
-      const messageToSave = new Message({room,message});
+    const {room, message, userName} = data;
+      io.to(room).emit('chat message', message, userName);
+      const messageToSave = new Message({room,message, userName});
       messageToSave.save();
     });
 

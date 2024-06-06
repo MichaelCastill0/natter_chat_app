@@ -55,7 +55,7 @@ function App() {
   });
 
   socket.on('chat message', (msg) => {
-    setMessages(prevMessages => [...prevMessages, { message: msg}]);
+    setMessages(prevMessages => [...prevMessages, { message: msg.message, userName: msg.username}]);
   });
 
   socket.on('roomCreated', (room) => {
@@ -130,7 +130,7 @@ const addUserToRoom = () => {
 const sendMessage = (e) => {
   e.preventDefault();
   if (message && room) {
-    socket.emit('sendMessage', {room, message });
+    socket.emit('sendMessage', {room, message, userName: user.name });
     setMessage('');
   }else {
     alert('Please enter a room name and a message.');
@@ -189,7 +189,7 @@ return (
     <div className = "chat-container">
     <ul id="messages">
       {messages.map((msg,index)=>(
-        <li key={index}>{msg.message}</li>
+        <li key={index}><strong>{msg.userName}: </strong>{msg.message}</li>
       ))}
     </ul>
 
