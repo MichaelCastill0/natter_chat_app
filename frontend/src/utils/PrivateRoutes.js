@@ -7,7 +7,7 @@ const useAuth = () => {
     const { user } = useContext(UserContext);
     return user && user.loggedIn;
 }
-const PrivateRoutes = ({ isAuth: isAuth, component: Component, ...rest }) => {
+const PrivateRoutes = ({ isAuth: isAuth, element: Element, ...rest }) => {
     //let auth = {'token':true}
    //const isAuth = useAuth();
 
@@ -15,7 +15,7 @@ const PrivateRoutes = ({ isAuth: isAuth, component: Component, ...rest }) => {
         <Route {...rest} 
             render={(props)=> {
                 if (isAuth){
-                    return <Component />
+                    return <Element />
                 } else {
                     return <Navigate to={{pathname: '/login', state: {from: props.location}}} />
                 }
