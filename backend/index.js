@@ -77,6 +77,14 @@ app.post('/', (req, res) => {
   // Send a response to the client
   res.status(200).send('POST request received');
 });
+
+app.get('/login', (req, res) => {
+  console.log('POST request received');
+  
+  // Send a response to the client
+  res.status(200).send('POST request received');
+});
+
 // Serve the static HTML file
 app.get('/index.html', (req, res) => {
   res.sendFile(join(__dirname, 'index.html'));
