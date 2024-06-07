@@ -1,21 +1,37 @@
-import React, { useState, useEffect} from 'react';
-import { jwtDecode } from 'jwt-decode';
-import io from 'socket.io-client';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import './App.css';
-
-const socket = io.connect('http://localhost:5000')
+import Login from './Login';
+import Chat from './Chat';
 
 function App() {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate()
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+   // navigate('/chat');
+
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  return (
+    <Router>
+      <Routes>
+        <Route path="/GoogleSignin" element={<Login onLogin={handleLogin} />} />
+        <Route path="/chat" element={<Chat user={user} onLogout={handleLogout} />} />
+      </Routes>
+    </Router>
+  );
+}
+/*
+function Login() {
   const [user, setUser] = useState({});
-  const [showSignIn, setShowSignIn] = useState(true); // State to control the visibility of the sign-in button
+  const navigate = useNavigate();
 
-  const [room, setRoom] = useState('');
-  const [message, setMessage] = useState('');
-  const[messages, setMessages] = useState([]);
-  const [rooms,setRooms] = useState([]);
-  const [emailToAdd, setEmailToAdd] = useState('')
-
-/* *********************Google Sign-In********************************************** */
   function handleCallbackResponse(response) {
     console.log(`Encode JWT ID token: ${response.credential}`);
     var userObject = jwtDecode(response.credential);
@@ -34,7 +50,7 @@ function App() {
   }
 
   useEffect(() => {
-    /* global google */
+    /* global google 
     google.accounts.id.initialize({
       client_id: "457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com",
       callback: handleCallbackResponse,
@@ -47,9 +63,28 @@ function App() {
       google.accounts.id.prompt();
     }
   }, [showSignIn]); // Re-run this effect only when showSignIn changes
+  
+}
+
+  */
+
+/* *********************Google Sign-In********************************************** */
+  
 
 /* ***************************Socket IO************************************** */
-  useEffect(()=> {
+/*
+  function chat() {
+
+    const [user, setUser] = useState({});
+  const [showSignIn, setShowSignIn] = useState(true); // State to control the visibility of the sign-in button
+
+  const [room, setRoom] = useState('');
+  const [message, setMessage] = useState('');
+  const[messages, setMessages] = useState([]);
+  const [rooms,setRooms] = useState([]);
+  const [emailToAdd, setEmailToAdd] = useState('');
+
+  useEffect (() => {
     socket.on('chatHistory', (Messages) => {
     setMessages(Messages);
   });
@@ -136,11 +171,12 @@ const sendMessage = (e) => {
     alert('Please enter a room name and a message.');
   }
 };
- 
+ */
+/*
 return (
   <div className="App">
     {showSignIn && <div id="signInDiv"></div>}{" "}
-    {/* Conditionally render the sign-in button */}
+    {/* Conditionally render the sign-in button }
     {Object.keys(user).length !== 0 && (
       <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
     )}
@@ -206,4 +242,7 @@ return (
   </div>
 );
 }
+
+
+*/
 export default App;

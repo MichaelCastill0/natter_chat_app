@@ -1,3 +1,7 @@
+//import ReactDOM from 'react-dom';
+//import { BrowserRouter } from 'react-router-dom';
+const ReactDOM = require('react-dom');
+const BrowserRouter = require('react-router-dom');
 const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
@@ -6,6 +10,7 @@ const cors = require('cors');
 const {OAuth2Client} = require('google-auth-library');
 const client = new OAuth2Client('457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com');
 const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser');
 
 const app = express();
 app.use(cors());
@@ -38,14 +43,17 @@ mongoose
 
 app.use(express.static(join(__dirname, 'client/build')));
 
-app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'index.html'));
-});
+
 
 app.use(express.json());
 
 
-
+//ReactDOM.render(
+//  <BrowserRouter>
+//    <App />
+//  </BrowserRouter>,
+//  document.getElementById('root')
+//);
 //io.on('connection', (socket) => {
 //  console.log('a user connected');
 //});
@@ -56,20 +64,42 @@ io.on('connection', (socket) => {
     });
   });
 */
-io.on('connection', (socket) => {
-  console.log(`User connected: ${socket.id}`);
+app.use(bodyParser.json());
 
-  /* Original Function
-  app.post('/google-login', async (req, res) => {
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request at ${req.url}`);
+  next();
+})
+
+app.post('/', (req, res) => {
+  console.log('POST request received');
+  
+  // Send a response to the client
+  res.status(200).send('POST request received');
+});
+// Serve the static HTML file
+app.get('/index.html', (req, res) => {
+  res.sendFile(join(__dirname, 'index.html'));
+});
+
+app.post('/google-signin', async (req, res) => {
   const { token } = req.body;
   const ticket = await client.verifyIdToken({
     idToken: token,
-      audience: '457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com',
+    audience: '457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com',
   });
-  const { name, email, picture } = ticket.getPayload();
+  //const { name, email, picture } = ticket.getPayload();
+  res.status(200).json({email, name, picture});
+  });
 
-  });
-*/
+
+
+io.on('connection', (socket) => {
+  console.log(`User connected: ${socket.id}`);
+
+  // Original Function/*
+
+
   // Modified function with socket
   socket.on('saveUser', async ({token}) => {
     const decodeToken = jwt.decode(token);  //decode token
@@ -78,10 +108,10 @@ io.on('connection', (socket) => {
     await userToSave.save(); //save schema to database
 
 
-//    const ticket = await client.verifyIdToken({
-//      idToken: token,
-//      audience: '457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com',
-//    });
+   // const ticket = await client.verifyIdToken({
+    //  idToken: token,
+    //  audience: '457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com',
+    //});
     
     //console.log(`User EMAIL: ${email} and USER NAME: ${name}`);
     
