@@ -3,8 +3,8 @@ import React, { useState, useEffect} from 'react';
 import io from 'socket.io-client';
 import { jwtDecode } from 'jwt-decode';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import App from '../App'
-import loggedIn from '../App'
+import { useAuthContext, AuthContextProvider } from '../Context/AuthContext';
+import Home from './Home';
 
 const socket = io.connect('http://localhost:5000')
 
@@ -13,6 +13,7 @@ function Login() {
     
     const [showSignIn, setShowSignIn] = useState(true); // State to control the visibility of the sign-in button
     const [user, setUser] = useState({});
+    const { authUser } = useAuthContext();
 
     function handleCallbackResponse(response) {
         console.log(`Encode JWT ID token: ${response.credential}`);
@@ -47,39 +48,69 @@ function Login() {
         }
       }, [showSignIn]); // Re-run this effect only when showSignIn changes
     
-    if(!loggedIn/*Need to use Context*/){
-      return (
-          <div>
-              <h2>Login Page</h2>
-              <img src={logo} alt="" />
-
-              {showSignIn && <div id="signInDiv">
-              {/* Conditionally render the sign-in button */}
-              {Object.keys(user).length !== 0 && (
-                  <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
-              )}
-              {Object.keys(user).length !== 0 && (
-                  <div>
-                  <img src={user.picture} alt="User profile" />
-                  <h3>{user.name}</h3>
-                  </div>
-              )}
-              </div>}{" "}
-
-          </div>
-      );
-  }
-  if(loggedIn/*Need to use Context*/){
+    
+  if(authUser){
     return(
         //Code to redirect to '/' a.k.a Home.js
         <BrowserRouter>
           <Routes>
-            <Route element={<App />} path="/" />
+            <AuthContextProvider isAuth={ false } />
+            <Route element={<Home />} path="/" />
           </Routes>
         </BrowserRouter>
+    );
+  }
+  else{
+    return (
+        <div>
+            <h2>Login Page</h2>
+            <img src={logo} alt="" />
+  
+            <div id="signInDiv"></div>
+  
+        </div>
     );
   }
 
 }
 
-export default Login
+export default Login;
+
+/*
+
+const Login = () => {
+    // Assuming you have a function to authenticate the user using Google OAuth
+    const handleGoogleLogin = () => {
+        // Authenticate the user using Google OAuth
+        // Once authenticated, obtain the user information
+        
+        // For example:
+        const authUser = {  'User information obtained from Google OAuth'  };
+
+        return (
+          <AuthContextProvider authUser={authUser}>
+              {'Your authenticated application components' }
+          </AuthContextProvider>
+      );
+  };
+
+  return (
+      <div>
+          {'Your login button or other login-related UI'}
+          <button onClick={handleGoogleLogin}>Login with Google</button>
+      </div>
+  );
+};
+
+export default Login;
+
+*/
+
+/*
+            {Object.keys(user).length !== 0 && (
+                <div>
+                <img src={user.picture} alt="User profile" />
+                <h3>{user.name}</h3>
+                </div>
+            )}
+*/

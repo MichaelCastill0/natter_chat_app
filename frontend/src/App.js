@@ -8,7 +8,7 @@ import NoPage from './Pages/NoPage'
 import PrivateRoutes from './utils/PrivateRoutes'
 import { jwtDecode } from 'jwt-decode';
 import io from 'socket.io-client';
-import { useAuthContext } from './Context/AuthContext';
+import { AuthContextProvider, useAuthContext } from './Context/AuthContext';
 import './App.css';
 
 
@@ -169,8 +169,8 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <PrivateRoutes isAuth={authUser} element={<Home />} path='/' />
-          <Route element={authUser ? <Navigate to='/' /> : <Login />} />
+          <Route path='/' element={useAuthContext ? <Home /> : <Login />} />
+          <Route path='/login' element={useAuthContext ? <Navigate to='/' /> : <Login />} />
         </Routes>
       </BrowserRouter>
     </div>

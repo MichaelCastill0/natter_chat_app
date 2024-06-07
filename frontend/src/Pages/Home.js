@@ -1,9 +1,8 @@
 import React, { useState, useEffect} from 'react';
 import { useNavigate, Router, Routes, Route } from 'react-router-dom';
-import Login from '../Pages/Login'
 import { jwtDecode } from 'jwt-decode';
 import io from 'socket.io-client';
-//import { useSignOut } from 'react-auth-kit/hooks/useSignOut';
+import { AuthContextProvider, useAuthContext } from '../Context/AuthContext';
 import '../App.css';
 
 const socket = io.connect('http://localhost:5000')
@@ -14,8 +13,9 @@ function Home() {
     const[messages, setMessages] = useState([]);
     const [rooms,setRooms] = useState([]);
     const [emailToAdd, setEmailToAdd] = useState('')
-
     const [user, setUser] = useState({});
+    
+    const { authUser } = useAuthContext();
 
     //const signOut = useSignOut();
     const navigate = useNavigate();
@@ -152,8 +152,10 @@ const sendMessage = (e) => {
             </div>
               <Routes>
                 <Route path = '/login' exact>
-                  <button onClick={()=> {setIsAuth(false), logout}}>
-                    Log Out
+                  <button onClick={(e) => logout(e)}>
+                    <AuthContextProvider isAuth={ false }>
+                      Log Out
+                    </AuthContextProvider>
                   </button>
                 </Route>
               </Routes>
