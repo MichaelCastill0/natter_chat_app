@@ -49,7 +49,7 @@ function Login() {
       }, [showSignIn]); // Re-run this effect only when showSignIn changes
     
     
-  if(authUser){
+  if(Object.keys(user).length !== 0){
     return(
         //Code to redirect to '/' a.k.a Home.js
         <BrowserRouter>

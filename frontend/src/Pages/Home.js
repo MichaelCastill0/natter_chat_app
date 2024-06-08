@@ -15,7 +15,7 @@ function Home() {
     const [emailToAdd, setEmailToAdd] = useState('')
     const [user, setUser] = useState({});
     
-    const { authUser } = useAuthContext();
+    const { loggedIn } = useAuthContext();
 
     //const signOut = useSignOut();
     const navigate = useNavigate();
@@ -152,11 +152,12 @@ const sendMessage = (e) => {
             </div>
               <Routes>
                 <Route path = '/login' exact>
-                  <button onClick={(e) => logout(e)}>
                     <AuthContextProvider isAuth={ false }>
-                      Log Out
+                      <button onClick={(e) => logout(e)}>
+                        Log Out
+                      </button>
                     </AuthContextProvider>
-                  </button>
+                  
                 </Route>
               </Routes>
             </div>
