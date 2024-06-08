@@ -54,8 +54,9 @@ function App() {
     setMessages(Messages);
   });
 
-  socket.on('chat message', (msg) => {
-    setMessages(prevMessages => [...prevMessages, { message: msg.message, userName: msg.username}]);
+  socket.on('chat message', ({message,userName}) => {
+    //alert(`New Message ${message} from ${userName}`);
+    setMessages(prevMessages => [...prevMessages, {message, userName}]);
   });
 
   socket.on('roomCreated', (room) => {
@@ -108,23 +109,45 @@ function App() {
 }, [rooms, user.email]);
 
 const createRoom = () => {
+  if(user.email){
   socket.emit('createRoom', {room, email: user.email});
+  } else {
+    alert('Must be signed in to create a room');
+  }
 };
 
 const joinRoom = () => {
+  if(user.email){
   socket.emit('joinRoom', {room, email: user.email});
+  } else {
+    alert('Must be signed in to join a room');
+  }
 };
 
 const leaveRoom = () => {
+  if(user.email){
   socket.emit('leaveRoom', {room, email: user.email});
+  setRoom('');
+  } else {
+    alert('Must be signed in to leave a room');
+  }
 };
 
 const deleteRoom = () => {
+  if(user.email){
   socket.emit('deleteRoom', room);
+  setRoom('');
+  } else {
+    alert('Must be signed in to delete a room');
+  }
 };
 
 const addUserToRoom = () => {
+  if(user.email){
   socket.emit('addUserToRoom', { email: emailToAdd, room });
+  } else{
+    alert('Must be signed in to add another user to a room');
+  }
 };
 
 const sendMessage = (e) => {

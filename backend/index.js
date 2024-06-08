@@ -145,7 +145,8 @@ io.on('connection', (socket) => {
 
   socket.on('sendMessage', async (data) => {
     const {room, message, userName} = data;
-      io.to(room).emit('chat message', message, userName);
+      console.log(`Test Message: ${message} from ${userName}`);
+      io.to(room).emit('chat message', {message, userName});
       const messageToSave = new Message({room,message, userName});
       messageToSave.save();
     });
