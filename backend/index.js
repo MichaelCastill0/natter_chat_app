@@ -13,7 +13,7 @@ app.use(cors());
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: 'https://natter-chat-app-vkak.onrender.com',
     methods: ['GET', 'POST'],
   },
 });
@@ -198,6 +198,6 @@ io.on('connection', (socket) => {
     });
   });
 */
-server.listen(5000, () => {
-  console.log('server running at http://localhost:5000');
+server.listen('https://natter-chat-app.onrender.com/', () => {
+  console.log('server running at https://natter-chat-app.onrender.com/');
 });
