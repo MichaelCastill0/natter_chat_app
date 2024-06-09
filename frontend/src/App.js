@@ -34,7 +34,7 @@ function App() {
   }
 
   useEffect(() => {
-    /* global google */
+    const google = window.google
     google.accounts.id.initialize({
       client_id: "457934960513-bh8upev2pr2f4hm5tqk245aq7fukbvqp.apps.googleusercontent.com",
       callback: handleCallbackResponse,
@@ -179,16 +179,10 @@ return (
     {showSignIn && <div id="signInDiv"></div>}{" "}
     {/* Conditionally render the sign-in button */}
     {Object.keys(user).length !== 0 && (
-      <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
-    )}
-    {Object.keys(user).length !== 0 && (
       <div>
         <img src={user.picture} alt="User profile" />
         <h3>{user.name}</h3>
-      </div>
-    )}
-
-    <div className="sidebar">
+        <div className="sidebar">
     <div id = "room-controls">
       <input
         id="roomName"
@@ -201,6 +195,7 @@ return (
       <button onClick={joinRoom}>Join Room</button>
       <button onClick={leaveRoom}>Leave Room</button>
       <button onClick={deleteRoom}>Delete Room</button>
+      <button onClick={(e) => handleSignOut(e)}>Sign Out</button>
 
       <input
             id="emailToAdd"
@@ -240,6 +235,8 @@ return (
         <button type="submit">send</button>
         </form>
         </div>
+      </div>
+    )}
   </div>
 );
 }
