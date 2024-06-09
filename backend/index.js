@@ -181,7 +181,13 @@ io.on('connection', (socket) => {
       //delete chatHistory[messages];
       await Message.deleteMany({room});
       io.in(room).socketsLeave(room);
-      io.emit('roomDeleted',room);
+      io.to(room).emit('roomDeleted',room);
+    });
+
+    socket.on('clearChatHistory', (deletedRoom) => {
+      if (room === deletedRoom) {
+        setMessages([]);
+      }
     });
 
     socket.on('disconnect', () => {

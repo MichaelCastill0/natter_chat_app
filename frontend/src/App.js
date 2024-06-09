@@ -77,8 +77,9 @@ function App() {
 
   socket.on('roomDeleted', (room) => {
     alert(`Room ${room} has been deleted!`);
-    setMessages([]);
+   // setMessages([]);
     setRooms(prevRooms => prevRooms.filter(r => r !== room));
+    io.to(room).emit('clearChatHistory');
   });
 
   socket.on('userAddedToRoom', ({ email, room }) => {
