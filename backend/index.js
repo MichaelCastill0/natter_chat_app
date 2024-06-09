@@ -92,14 +92,17 @@ io.on('connection', (socket) => {
     const {room, email} = data;
     //const email = socket.handshake.query.email; // Assuming email is sent in query params during connection
     const user = await User.findOne({ email });
-    if (user) {
+    const roomExists = await mongoose.collection('users').find({ rooms: [room]});
+    if (user && !roomExists) {
       if (!user.rooms.includes(room)) {
         user.rooms.push(room);
         await user.save();
+        socket.join(room);
+        socket.emit('roomCreated', room);
+        io.to(socket.id).emit('userRooms', user.rooms);
       }
-      socket.join(room);
-      socket.emit('roomCreated', room);
-      io.to(socket.id).emit('userRooms', user.rooms);
+    }else{
+      socket.emit('roomCreated', null);
     }
   });
 

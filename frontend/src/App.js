@@ -60,8 +60,12 @@ function App() {
   });
 
   socket.on('roomCreated', (room) => {
-    alert(`Room ${room} created!`);
-    setRooms(prevRooms => [...prevRooms, room]);
+    if(!room){
+      alert(`Room ${room} already exists`)
+    }else{
+      alert(`Room ${room} created!`);
+      setRooms(prevRooms => [...prevRooms, room]);
+    }
   });
 
   socket.on('roomJoined', (room) =>{
