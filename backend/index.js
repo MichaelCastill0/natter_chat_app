@@ -175,20 +175,36 @@ io.on('connection', (socket) => {
       
     });
 
+    socket.on('removeUserFromRoom', async ({ email, room }) => {
+ 
+      const user = await User.findOne({ email });
+      if (user) {
+        if (user) {
+          user.rooms = user.rooms.filter(r => r !== room);
+          await user.save();
+          io.to(socket.id).emit('userRooms', user.rooms);
+        }
+        socket.to(room).emit('userRemovedFromRoom', { email, room });
+      } else {
+        socket.emit('error', 'User not found');
+      }
+  });
 
-
-    socket.on('deleteRoom', async (room) => {
-      //delete chatHistory[messages];
+    socket.on('deleteRoom', async ({room,email}) => {
       await Message.deleteMany({room});
-      io.in(room).socketsLeave(room);
-      io.to(room).emit('roomDeleted',room);
-    });
+      io.of('/').in(room).socketsLeave(room);
+      io.of('/').emit('roomDeleted', room);
 
-    socket.on('clearChatHistory', (deletedRoom) => {
-      if (room === deletedRoom) {
-        setMessages([]);
+      const user = await User.findOne({ email });
+      console.log(`User left room: ${room}`);
+      if (user) {
+        user.rooms = user.rooms.filter(r => r !== room);
+        await user.save();
+        io.to(socket.id).emit('userRooms', user.rooms);
       }
     });
+
+
 
     socket.on('disconnect', () => {
       console.log(`User disconnected: ${socket.id}`)

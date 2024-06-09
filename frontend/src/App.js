@@ -75,11 +75,23 @@ function App() {
     setRooms(prevRooms => prevRooms.filter(r => r !== room));
   });
 
-  socket.on('roomDeleted', (room) => {
-    alert(`Room ${room} has been deleted!`);
+  socket.on('roomDeleted', (deletedRoom) => {
+    
    // setMessages([]);
-    setRooms(prevRooms => prevRooms.filter(r => r !== room));
-    io.to(room).emit('clearChatHistory');
+    setRooms(prevRooms => prevRooms.filter(r => r !== deletedRoom));
+    if (room === deletedRoom) {
+      alert(`Room ${room} has been deleted!`);
+      setMessages([]);
+      socket.emit('removeUserFromRoom',{room, email: user.email})
+    }
+ //   socket.emit('clearChatHistory',{deletedRoom});
+  });
+
+  socket.on('clearChatHistory', ({deletedRoom}) => {
+    alert(`Room ${room} has been deleted!`);
+    if (room === deletedRoom) {
+      setMessages([]);
+    }
   });
 
   socket.on('userAddedToRoom', ({ email, room }) => {
@@ -103,6 +115,7 @@ function App() {
     socket.off('roomJoined');
     socket.off('roomLeft');
     socket.off('roomDeleted');
+    socket.off('clearChatHistory');
     socket.off('userAddedToRoom');
     socket.off('userRooms');
     socket.off('error');
@@ -136,7 +149,7 @@ const leaveRoom = () => {
 
 const deleteRoom = () => {
   if(user.email){
-  socket.emit('deleteRoom', room);
+  socket.emit('deleteRoom', {room, email: user.email});
   setRoom('');
   } else {
     alert('Must be signed in to delete a room');
