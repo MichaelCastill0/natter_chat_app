@@ -171,10 +171,7 @@ return (
       <div>
         <img src={user.picture} alt="User profile" />
         <h3>{user.name}</h3>
-      </div>
-    )}
-
-    <div className="sidebar">
+        <div className="sidebar">
     <div id = "room-controls">
       <input
         id="roomName"
@@ -226,6 +223,10 @@ return (
         <button type="submit">send</button>
         </form>
         </div>
+      </div>
+    )}
+
+
   </div>
 );
 }
