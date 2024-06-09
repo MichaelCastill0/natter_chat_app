@@ -198,6 +198,6 @@ io.on('connection', (socket) => {
     });
   });
 */
-server.listen('https://natter-chat-app.onrender.com/', () => {
-  console.log('server running at https://natter-chat-app.onrender.com/');
+server.listen(5000, () => {
+  console.log('server running at 5000');
 });
