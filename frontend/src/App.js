@@ -3,7 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import io from 'socket.io-client';
 import './App.css';
 
-const socket = io.connect('http://localhost:5000')
+const socket = io.connect('https://natter-chat-app.onrender.com')
 
 function App() {
   const [user, setUser] = useState({});
