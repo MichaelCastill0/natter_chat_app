@@ -99,11 +99,11 @@ io.on('connection', (socket) => {
         await user.save();
         socket.join(room);
         socket.emit('roomCreated', room);
-        io.to(socket.id).emit('userRooms', user.rooms);
       }
     }else{
       socket.emit('roomCreated', null);
     }
+    io.to(socket.id).emit('userRooms', user.rooms);
   });
 
   socket.on('joinRoom', async (data) => {
